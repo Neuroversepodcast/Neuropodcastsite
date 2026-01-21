@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Neuroverse Podcast</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+/* ===== GLOBAL ===== */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: #000;
+  color: #fff;
+  overflow: hidden; /* disable scroll until rocket finishes */
+}
+
+h1, h2 {
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 2px;
+}
+
+/* ===== STARFIELD CANVAS ===== */
+#spaceCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+}
+
+/* ===== PARTICLE CANVAS ===== */
+#particleCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* ===== TRANSITION OVERLAY ===== */
+#warpOverlay {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 999;
+  transition: opacity 0.6s ease;
+}
+
+/* ===== ROCKET IMAGE ===== */
+#rocket {
+  position: fixed;
+  top: -500px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  z-index: 1000;
+  width: 200px;
+  filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+}
+
+/* Sparks container */
+.sparks {
+  position: fixed;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 1001;
+}
+
+.spark {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, #fffc9c 0%, #ff6600 70%, transparent 100%);
+  border-radius: 50%;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+/* ===== HERO ===== */
+.hero {
+  height: 100vh;
+  background: linear-gradient(270deg, rgba(127,0,255,0.8), rgba(0,198,255,0.8), rgba(127,0,255,0.8));
+  background-size: 600% 600%;
+  animation: gradientShift 15s ease infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.hero h1 {
+  font-size: 3.5rem;
+  text-shadow: 0 0 20px rgba(0,255,231,0.5);
+  animation: titleGlow 3s ease-in-out infinite;
+}
+
+@keyframes titleGlow {
+  0%, 100% { text-shadow: 0 0 20px rgba(0,255,231,0.5); }
+  50% { text-shadow: 0 0 40px rgba(0,255,231,0.8), 0 0 60px rgba(0,255,231,0.4); }
+}
+
+.hero span {
+  color: #00ffe7;
+}
+
+.hero p {
+  max-width: 700px;
+  margin: auto;
+  font-size: 1.2rem;
+  text-shadow: 0 0 5px rgba(0,255,231,0.4);
+}
+
+/* BUTTON */
+#enterBtn {
+  margin-top: 30px;
+  padding: 15px 40px;
+  border-radius: 30px;
+  border: 2px solid #00ffe7;
+  background: rgba(0,0,0,0.7);
+  color: #00ffe7;
+  cursor: pointer;
+  transition: 0.4s;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: 0 0 20px rgba(0,255,231,0.3);
+}
+
+#enterBtn:hover {
+  background: #00ffe7;
+  color: #000;
+  transform: scale(1.1);
+  box-shadow: 0 0 40px rgba(0,255,231,0.6);
+}
+
+/* ===== ABOUT ===== */
+.about {
+  padding: 90px 10%;
+  background: rgba(5,5,5,0.9);
+  text-align: center;
+}
+
+.about h2 {
+  font-size: 2.5rem;
+  color: #00ffe7;
+  margin-bottom: 30px;
+}
+
+.about p {
+  max-width: 800px;
+  margin: auto;
+  line-height: 1.8;
+  color: #ccc;
+  font-size: 1.1rem;
+}
+
+/* ===== YOUTUBE SECTION ===== */
+.youtube-section {
+  padding: 80px 10%;
+  background: linear-gradient(135deg, rgba(20,0,40,0.9) 0%, rgba(0,20,40,0.9) 100%);
+  text-align: center;
+}
+
+.youtube-section h2 {
+  font-size: 2.5rem;
+  color: #00ffe7;
+  margin-bottom: 20px;
+}
+
+.youtube-cta {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 18px 50px;
+  background: #ff0000;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 50px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  transition: 0.3s;
+  box-shadow: 0 5px 25px rgba(255,0,0,0.4);
+}
+
+.youtube-cta:hover {
+  background: #cc0000;
+  transform: translateY(-5px);
+  box-shadow: 0 10px 40px rgba(255,0,0,0.6);
+}
+
+.youtube-cta::before {
+  content: "▶ ";
+  font-size: 1.4rem;
+}
+
+/* ===== QUOTE ===== */
+.quote {
+  padding: 80px 10%;
+  text-align: center;
+  background: rgba(0,0,0,0.5);
+}
+
+.quote blockquote {
+  font-size: 1.6rem;
+  color: #00ffe7;
+  transition: 0.6s ease;
+  font-style: italic;
+  max-width: 700px;
+  margin: auto;
+}
+
+.quote blockquote:hover {
+  letter-spacing: 4px;
+  text-shadow: 0 0 15px rgba(0,255,231,0.6);
+}
+
+/* ===== FOOTER ===== */
+footer {
+  background: #020202;
+  text-align: center;
+  padding: 30px;
+  font-size: 0.9rem;
+  color: #777;
+}
+
+/* Floating elements animation */
+.floating {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero h1 { font-size: 2.5rem; }
+  .hero p { font-size: 1rem; }
+  .about h2, .youtube-section h2 { font-size: 2rem; }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="spaceCanvas"></canvas>
+<canvas id="particleCanvas"></canvas>
+
+<!-- TRANSITION -->
+<div id="warpOverlay"></div>
+
+<!-- ROCKET IMAGE -->
+<img id="rocket" src="rocket.png" alt="Rocket" width="200">
+<div class="sparks" id="sparksContainer"></div>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="floating">
+    <h1>INTO THE <span>NEUROVERSE</span></h1>
+    <p>
+      A laid-back podcast about autism, real life, and random thoughts that somehow turn into deep conversations. Featuring guests, funny stories, unfiltered moments, and questionable jokes.
+    </p>
+    <button id="enterBtn">Enter the Neuroverse</button>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <h2>About the Podcast</h2>
+  <p>
+    The Neuroverse is a casual, honest podcast centered around autistic experiences — the good, the awkward, and the hilarious. We invite guests from all walks of life to talk about identity, daily life, special interests, and whatever else the conversation accidentally turns into. No serious vibes, just relatable content.
+  </p>
+</section>
+
+<!-- YOUTUBE SECTION -->
+<section class="youtube-section">
+  <h2>Watch on YouTube</h2>
+  <p style="color: #ccc; font-size: 1.1rem; margin-bottom: 10px;">
+    Catch all our episodes, and bonus content on youtube.
+  </p>
+  <a href="https://www.youtube.com/@yourchannel" class="youtube-cta" target="_blank">
+    Subscribe on YouTube
+  </a>
+</section>
+
+<!-- QUOTE -->
+<section class="quote">
+  <blockquote>
+    "Crash landed here, where are the instructions?"
+  </blockquote>
+</section>
+
+<footer>
+  © 2026 The Neuroverse · Hosted by The Neuromaster
+</footer>
+
+<script>
+/* ===== STARFIELD ===== */
+const canvas = document.getElementById("spaceCanvas");
+const ctx = canvas.getContext("2d");
+let stars = [];
+
+const particleCanvas = document.getElementById("particleCanvas");
+const pctx = particleCanvas.getContext("2d");
+
+function resize() {
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+  particleCanvas.width = innerWidth;
+  particleCanvas.height = innerHeight;
+}
+resize();
+addEventListener("resize", resize);
+
+// Stars
+for (let i = 0; i < 200; i++) {
+  stars.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, z: Math.random()*2.5+0.5, twinkle: Math.random()*Math.PI*2 });
+}
+
+function animateStars() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  stars.forEach(s => {
+    s.x -= s.z*1.5;
+    if(s.x<0)s.x=canvas.width;
+    s.twinkle += 0.03;
+    const alpha = 0.4 + Math.sin(s.twinkle)*0.4;
+    ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+    ctx.fillRect(s.x, s.y, s.z, s.z);
+  });
+  requestAnimationFrame(animateStars);
+}
+animateStars();
+
+// Particles
+let particles = [];
+class Particle {
+  constructor(){
+    this.x = Math.random()*particleCanvas.width;
+    this.y = Math.random()*particleCanvas.height;
+    this.size = Math.random()*3+1;
+    this.speedX = Math.random()*1-0.5;
+    this.speedY = Math.random()*1-0.5;
+    this.color = `hsla(${Math.random()*60+180},100%,70%,${Math.random()*0.5+0.2})`;
+  }
+  update(){
+    this.x+=this.speedX;
+    this.y+=this.speedY;
+    if(this.x>particleCanvas.width)this.x=0;
+    if(this.x<0)this.x=particleCanvas.width;
+    if(this.y>particleCanvas.height)this.y=0;
+    if(this.y<0)this.y=particleCanvas.height;
+  }
+  draw(){
+    pctx.fillStyle=this.color;
+    pctx.beginPath();
+    pctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+    pctx.fill();
+  }
+}
+for(let i=0;i<80;i++){particles.push(new Particle());}
+
+function connectParticles(){
+  for(let i=0;i<particles.length;i++){
+    for(let j=i+1;j<particles.length;j++){
+      const dx=particles[i].x-particles[j].x;
+      const dy=particles[i].y-particles[j].y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<150){
+        pctx.strokeStyle=`rgba(0,255,231,${0.15*(1-dist/150)})`;
+        pctx.lineWidth=1;
+        pctx.beginPath();
+        pctx.moveTo(particles[i].x,particles[i].y);
+        pctx.lineTo(particles[j].x,particles[j].y);
+        pctx.stroke();
+      }
+    }
+  }
+}
+
+function animateParticles(){
+  pctx.clearRect(0,0,particleCanvas.width,particleCanvas.height);
+  particles.forEach(p=>{p.update();p.draw();});
+  connectParticles();
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+/* ===== ROCKET ANIMATION WITH SPARKS ===== */
+const btn = document.getElementById("enterBtn");
+const overlay = document.getElementById("warpOverlay");
+const rocket = document.getElementById("rocket");
+const sparksContainer = document.getElementById("sparksContainer");
+
+function createSparks(x, y){
+  for(let i=0;i<5;i++){
+    const spark = document.createElement("div");
+    spark.className = "spark";
+    spark.style.left = (x + (Math.random()*40-20)) + "px";
+    spark.style.top = (y + (Math.random()*40-20)) + "px";
+    sparksContainer.appendChild(spark);
+    setTimeout(()=>{spark.remove();},500);
+  }
+}
+
+btn.addEventListener("click", () => {
+  overlay.style.opacity="1";
+  rocket.style.opacity="1";
+
+  const rocketAnim = rocket.animate([
+    { top: "-500px", opacity:0, filter:"blur(0px)" },
+    { top: "50%", opacity:1, filter:"blur(2px)", offset:0.5 },
+    { top: "90%", opacity:1, filter:"blur(3px)" },
+    { top: "100%", opacity:1, filter:"blur(5px)" }
+  ], {
+    duration: 4000, // slower
+    easing: "cubic-bezier(0.4,0,0.2,1)",
+    fill:"forwards"
+  });
+
+  // Create sparks periodically during descent
+  const sparkInterval = setInterval(()=>{
+    const rect = rocket.getBoundingClientRect();
+    createSparks(rect.left + rect.width/2, rect.top + rect.height/2);
+  }, 200);
+
+  rocketAnim.onfinish = () => {
+    clearInterval(sparkInterval);
+    overlay.style.opacity="0";
+    rocket.style.opacity="0";
+    rocket.style.top="-500px";
+    document.body.style.overflow="auto"; // enable scroll after animation
+    window.scrollTo({ top: document.getElementById("about").offsetTop, behavior: "smooth" });
+  };
+});
+</script>
+
+</body>
+</html>
+
+
