@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
-/* ===== HARD SCROLL LOCK ===== */
+/* ===== SCROLL LOCK ===== */
 html.locked,
 body.locked {
   height: 100%;
@@ -73,8 +73,20 @@ canvas {
   cursor: pointer;
 }
 
+/* ===== ROCKET ===== */
+#rocket {
+  position: fixed;
+  top: -500px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  z-index: 1000;
+  width: 200px;
+  filter: drop-shadow(0 0 30px rgba(0,255,231,0.8));
+}
+
 /* ===== ABOUT ===== */
-.about { background: rgba(5,5,5,0.85); }
+.about { background: rgba(5,5,5,0.85); padding: 90px 10%; text-align:center; }
 .about h2 { font-size: clamp(1.8rem, 6vw, 2.5rem); color:#00ffe7; margin-bottom:20px; }
 .about p { max-width: 900px; margin:auto; font-size: clamp(0.95rem, 3.8vw, 1.15rem); line-height:1.6; color:#ccc; }
 
@@ -120,14 +132,19 @@ footer { background:#020202; text-align:center; padding:30px; font-size:0.9rem; 
   .platform-cta { font-size:1rem; padding:14px 28px; }
   .platform-cta img { width:22px; }
   .audio-player { padding:20px; }
+  #rocket { width:120px; }
 }
 </style>
 </head>
 
 <body class="locked">
+
 <canvas id="spaceCanvas"></canvas>
 <canvas id="particleCanvas"></canvas>
 <canvas id="platformParticles"></canvas>
+
+<div id="warpOverlay" style="position:fixed; inset:0; background:#000; opacity:0; pointer-events:none; z-index:999; transition:0.6s;"></div>
+<img id="rocket" src="rocket.png">
 
 <section class="hero">
   <div>
@@ -210,10 +227,23 @@ lockScroll();
 window.addEventListener("wheel", e => locked && e.preventDefault(), { passive:false });
 window.addEventListener("touchmove", e => locked && e.preventDefault(), { passive:false });
 
-document.getElementById("enterBtn").addEventListener("click", () => {
-  locked = false;
-  unlockScroll();
-  document.getElementById("about").scrollIntoView({ behavior: "smooth" });
+/* ===== ENTER BUTTON + ROCKET ===== */
+const btn = document.getElementById("enterBtn");
+const overlay = document.getElementById("warpOverlay");
+const rocket = document.getElementById("rocket");
+
+btn.addEventListener("click", ()=>{
+  overlay.style.opacity="1";
+  rocket.style.opacity="1";
+  rocket.animate([{top:"-500px",opacity:0},{top:"100%",opacity:1}],{duration:4000,easing:"cubic-bezier(0.4,0,0.2,1)",fill:"forwards"});
+  setTimeout(()=>{
+    overlay.style.opacity="0";
+    rocket.style.opacity="0";
+    rocket.style.top="-500px";
+    locked = false;
+    unlockScroll();
+    document.getElementById("about").scrollIntoView({behavior:"smooth"});
+  },4000);
 });
 
 /* ===== CANVAS DPI FIX ===== */
@@ -255,20 +285,46 @@ const audio=document.getElementById("audio");
 const playBtn=document.getElementById("playPause");
 const wf=document.getElementById("waveform");
 const wctx=wf.getContext("2d");
-wf.width=wf.offsetWidth; wf.height=wf.offsetHeight;
-const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-const source=audioCtx.createMediaElementSource(audio);
-const analyser=audioCtx.createAnalyser();
-source.connect(analyser); analyser.connect(audioCtx.destination); analyser.fftSize=256;
-const bufferLength=analyser.frequencyBinCount; const dataArray=new Uint8Array(bufferLength);
-playBtn.onclick=()=>{ if(audio.paused){audioCtx.resume();audio.play();playBtn.textContent="❚❚";}else{audio.pause();playBtn.textContent="▶";} };
+
+function resizeWave() {
+  wf.width = wf.offsetWidth;
+  wf.height = wf.offsetHeight;
+}
+resizeWave();
+window.addEventListener("resize", resizeWave);
+
+const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+const source = audioCtx.createMediaElementSource(audio);
+const analyser = audioCtx.createAnalyser();
+source.connect(analyser);
+analyser.connect(audioCtx.destination);
+analyser.fftSize = 256;
+const bufferLength = analyser.frequencyBinCount;
+const dataArray = new Uint8Array(bufferLength);
+
+playBtn.onclick = () => {
+  if(audio.paused){
+    audioCtx.resume();
+    audio.play();
+    playBtn.textContent = "❚❚";
+  } else {
+    audio.pause();
+    playBtn.textContent = "▶";
+  }
+};
+
 (function drawWave(){
   requestAnimationFrame(drawWave);
   analyser.getByteFrequencyData(dataArray);
   wctx.clearRect(0,0,wf.width,wf.height);
-  const barWidth=wf.width/bufferLength;
-  dataArray.forEach((v,i)=>{ const h=v/255*wf.height; wctx.fillStyle=`rgba(0,255,231,0.8)`; wctx.fillRect(i*barWidth,wf.height-h,barWidth-1,h); });
+  const barWidth = wf.width / bufferLength;
+  dataArray.forEach((v,i)=>{
+    const h = v/255 * wf.height;
+    wctx.fillStyle = "rgba(0,255,231,0.8)";
+    wctx.fillRect(i*barWidth, wf.height-h, barWidth-1, h);
+  });
 })();
 </script>
+
 </body>
 </html>
