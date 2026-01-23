@@ -3,169 +3,145 @@
 <head>
 <meta charset="UTF-8">
 <title>The Neuroverse Podcast</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
-  /* ===== MOBILE VIEWPORT FIX ===== */
-.hero {
-  min-height: 100svh; /* fixes mobile browser chrome issues */
-}
 
 /* ===== GLOBAL ===== */
-body {
+html, body {
   margin: 0;
+  padding: 0;
   font-family: 'Poppins', sans-serif;
   background: #000;
   color: #fff;
+  overflow: hidden; /* LOCK SCROLL */
+  overscroll-behavior: none;
 }
 
-
-h1, h2 { font-family: 'Orbitron', sans-serif; letter-spacing: 2px; text-shadow: 0 0 15px #00ffe7; }
+h1, h2 {
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 2px;
+  text-shadow: 0 0 15px #00ffe7;
+}
 
 /* ===== CANVASES ===== */
-#spaceCanvas, #particleCanvas, #platformParticles { position: fixed; inset:0; z-index:-3; pointer-events:none; }
-
-/* ===== TRANSITION ===== */
-#warpOverlay { position: fixed; inset: 0; background: #000; opacity:0; pointer-events:none; z-index:999; transition: opacity 0.6s ease; }
-
-/* ===== ROCKET ===== */
-#rocket { position: fixed; top:-500px; left:50%; transform:translateX(-50%); opacity:0; z-index:1000; width:200px; filter: drop-shadow(0 0 30px rgba(0,255,231,0.8)); }
+#spaceCanvas,
+#particleCanvas,
+#platformParticles {
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  pointer-events: none;
+}
 
 /* ===== HERO ===== */
 .hero {
+  min-height: 100svh;
   height: 100vh;
   background: linear-gradient(270deg, rgba(127,0,255,0.9), rgba(0,198,255,0.9), rgba(127,0,255,0.9));
   background-size: 600% 600%;
   animation: gradientShift 15s ease infinite;
-  display: flex; align-items:center; justify-content:center; text-align:center; padding:40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px;
 }
-@keyframes gradientShift { 0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;} }
 
-.hero h1 { font-size: 3.5rem; animation: titleGlow 3s ease-in-out infinite; }
-@keyframes titleGlow { 0%,100%{text-shadow:0 0 20px #00ffe7;}50%{text-shadow:0 0 40px #00ffe7,0 0 60px #00ffe7;} }
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 6vw, 3.5rem);
+}
+
+.hero p {
+  max-width: 700px;
+  margin: auto;
+  font-size: clamp(1rem, 4vw, 1.2rem);
+}
 
 .hero span { color: #00ffe7; }
-.hero p { max-width: 700px; margin:auto; font-size:1.2rem; text-shadow:0 0 10px #00ffe7; }
 
 #enterBtn {
-  margin-top:30px; padding:15px 40px; border-radius:30px;
-  border:2px solid #00ffe7; background: rgba(0,0,0,0.5);
-  color:#00ffe7; cursor:pointer; font-weight:600; font-size:1.1rem; box-shadow:0 0 30px #00ffe7; transition:0.4s;
+  margin-top: 30px;
+  padding: 15px 40px;
+  border-radius: 30px;
+  border: 2px solid #00ffe7;
+  background: rgba(0,0,0,0.5);
+  color: #00ffe7;
+  cursor: pointer;
+  font-size: 1.1rem;
+  box-shadow: 0 0 30px #00ffe7;
+  transition: 0.3s;
 }
-#enterBtn:hover { background:#00ffe7; color:#000; transform:scale(1.1); box-shadow:0 0 50px #00ffe7; }
 
-/* ===== ABOUT ===== */
-.about {
-  padding: 90px 10%; text-align:center; background: rgba(5,5,5,0.8);
+#enterBtn:hover {
+  background: #00ffe7;
+  color: #000;
+  transform: scale(1.05);
 }
-.about h2 { font-size:2.5rem; color:#00ffe7; margin-bottom:30px; }
-.about p { max-width:900px; margin:auto; line-height:1.8; color:#ccc; font-size:1.2rem; }
 
-/* ===== AUDIO TEASER ===== */
-.audio-teaser {
-  padding:90px 10%; text-align:center;
-  background: radial-gradient(circle at center, rgba(0,255,231,0.2), transparent 70%), linear-gradient(180deg, #020202,#000);
+/* ===== SECTIONS ===== */
+section {
+  padding: 80px 10%;
+  text-align: center;
 }
-.audio-teaser h2 { color:#00ffe7; margin-bottom:20px; text-shadow:0 0 20px #00ffe7; }
-.audio-player {
-  max-width:600px; margin:auto; padding:25px;
-  border-radius:20px; background: linear-gradient(135deg, rgba(0,255,231,0.15), rgba(127,0,255,0.15)), rgba(0,0,0,0.7);
-  box-shadow:0 0 60px #00ffe7; backdrop-filter: blur(6px);
-}
-.audio-controls { display:flex; align-items:center; justify-content:center; gap:20px; margin-bottom:15px; }
-.play-btn {
-  width:60px; height:60px; border-radius:50%; border:2px solid #00ffe7; background:transparent; color:#00ffe7; font-size:1.5rem; cursor:pointer; transition:0.3s;
-}
-.play-btn:hover { background:#00ffe7; color:#000; }
-#waveform { width:100%; height:120px; }
 
-/* ===== PLATFORM BUTTONS ===== */
-.youtube-section {
-  position:relative; padding:120px 10%; text-align:center; overflow:hidden; margin:40px 10px; border-radius:20px;
-}
+.about { background: rgba(5,5,5,0.85); }
+.about p { max-width: 900px; margin: auto; line-height: 1.7; color: #ccc; }
+
+.audio-teaser { background: #020202; }
+
+.youtube-section { margin: 40px 10px; }
+
 .platform-cta {
-  position:relative; display:inline-flex; align-items:center; gap:14px; padding:18px 50px; border-radius:50px;
-  text-decoration:none; font-weight:600; transition:0.3s; font-size:1.2rem; box-shadow:0 0 30px #00ffe7; backdrop-filter:blur(4px);
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 36px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-size: 1.1rem;
 }
-.platform-cta img { width:28px; }
-.spotify { background: rgba(29,185,84,0.85); color:#000; }
-.spotify:hover { box-shadow:0 0 60px #1db954; transform:scale(1.05); }
-.youtube { background: rgba(255,0,0,0.85); color:#fff; }
-.youtube:hover { box-shadow:0 0 60px #ff0000; transform:scale(1.05); }
 
-/* ===== GUEST FORM ===== */
-.guest-form { padding:90px 10%; text-align:center; background: rgba(10,10,10,0.9); border-radius:20px; margin:40px 10px; }
-.guest-form h2 { color:#00ffe7; margin-bottom:20px; text-shadow:0 0 20px #00ffe7; }
-.guest-form form { max-width:600px; margin:auto; display:flex; flex-direction:column; gap:15px; }
-.guest-form input, .guest-form textarea, .guest-form button {
-  padding:12px 15px; border-radius:10px; border:none; font-size:1rem; outline:none; font-family:'Poppins', sans-serif;
+.spotify { background: #1db954; color: #000; }
+.youtube { background: #ff0000; color: #fff; }
+
+.quote blockquote {
+  font-size: clamp(1.1rem, 4vw, 1.6rem);
+  color: #00ffe7;
+  font-style: italic;
 }
-.guest-form input, .guest-form textarea { background: rgba(0,0,0,0.6); color:#fff; box-shadow:0 0 20px #00ffe7; }
-.guest-form input::placeholder, .guest-form textarea::placeholder { color:#ccc; }
-.guest-form button { background:#00ffe7; color:#000; font-weight:600; cursor:pointer; transition:0.3s; box-shadow:0 0 30px #00ffe7; }
-.guest-form button:hover { background:#00ffe7; transform:scale(1.05); }
-
-/* ===== QUOTE ===== */
-.quote { padding:80px 10%; text-align:center; background: rgba(0,0,0,0.5); }
-.quote blockquote { font-size:1.6rem; color:#00ffe7; font-style:italic; transition:0.6s ease; }
-.quote blockquote:hover { letter-spacing:4px; text-shadow:0 0 30px #00ffe7; }
 
 /* ===== FOOTER ===== */
-footer { background:#020202; text-align:center; padding:30px; font-size:0.9rem; color:#777; }
+footer {
+  padding: 30px;
+  font-size: 0.9rem;
+  color: #777;
+  background: #020202;
+}
+
 /* ===== MOBILE FIXES ===== */
 @media (max-width: 768px) {
-
-  h1 {
-    font-size: 2.2rem;
-    letter-spacing: 1px;
-  }
-
-  .hero p {
-    font-size: 1rem;
-    padding: 0 10px;
-  }
-
-  .about,
-  .audio-teaser,
-  .guest-form,
-  .quote {
+  section {
     padding: 60px 6%;
   }
-
-  .about p,
-  .audio-teaser p {
-    font-size: 1rem;
-    line-height: 1.6;
-  }
-
-  .platform-cta {
-    font-size: 1rem;
-    padding: 14px 28px;
-  }
-
-  .platform-cta img {
-    width: 22px;
-  }
-
-  .quote blockquote {
-    font-size: 1.2rem;
-  }
-
-  #rocket {
-    width: 120px;
-  }
 }
+
 </style>
 </head>
+
 <body>
 
 <canvas id="spaceCanvas"></canvas>
 <canvas id="particleCanvas"></canvas>
 <canvas id="platformParticles"></canvas>
-
-<div id="warpOverlay"></div>
-<img id="rocket" src="rocket.png">
 
 <section class="hero">
   <div>
@@ -179,48 +155,17 @@ footer { background:#020202; text-align:center; padding:30px; font-size:0.9rem; 
   <h2>About the Podcast</h2>
   <p>
     The Neuroverse is a casual, honest podcast centered around autistic experiences —
-    the good, the awkward, and the hilarious. We invite guests from all walks of life
-    to talk about identity, daily life, special interests, and whatever else the
-    conversation accidentally turns into. No serious vibes, just relatable content.
+    the good, the awkward, and the hilarious.
   </p>
 </section>
 
 <section class="audio-teaser">
   <h2>Teaser Intro</h2>
-  <div class="audio-player">
-    <div class="audio-controls">
-      <button class="play-btn" id="playPause">▶</button>
-    </div>
-    <canvas id="waveform"></canvas>
-    <audio id="audio" src="teaser-intro.wav"></audio>
-  </div>
 </section>
 
 <section class="youtube-section">
-  <a class="platform-cta spotify"
-     href="https://open.spotify.com/show/7IzMzDXu9gmOTYmNYt1DSV"
-     target="_blank" rel="noopener">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/8/84/Spotify_icon.svg">
-    Listen on Spotify
-  </a>
-  <br><br>
-  <a class="platform-cta youtube"
-     href="https://www.youtube.com/channel/UCtoaWJkqfeI83l5HItrxVGw"
-     target="_blank" rel="noopener">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/YouTube_Logo_2017.svg">
-    Subscribe on YouTube
-  </a>
-</section>
-
-
-<section class="guest-form">
-  <h2>Be a Guest on the Podcast</h2>
-  <form action="https://formspree.io/f/meeajkwo" method="POST">
-    <input type="text" name="name" placeholder="Your Name" required>
-    <input type="email" name="email" placeholder="Your Email" required>
-    <textarea name="message" placeholder="Why do you want to be on the podcast?" rows="5" required></textarea>
-    <button type="submit">Send Request</button>
-  </form>
+  <a class="platform-cta spotify" href="#" target="_blank">Listen on Spotify</a><br><br>
+  <a class="platform-cta youtube" href="#" target="_blank">Subscribe on YouTube</a>
 </section>
 
 <section class="quote">
@@ -230,71 +175,28 @@ footer { background:#020202; text-align:center; padding:30px; font-size:0.9rem; 
 <footer>© 2026 The Neuroverse</footer>
 
 <script>
-/* ===== CANVAS ANIMATIONS ===== */
-function resize() {
-  const dpr = window.devicePixelRatio || 1;
+/* ===== SCROLL LOCK CONTROL ===== */
+const enterBtn = document.getElementById("enterBtn");
 
-  ["spaceCanvas","particleCanvas","platformParticles"].forEach(id => {
-    const c = document.getElementById(id);
-    c.width = window.innerWidth * dpr;
-    c.height = window.innerHeight * dpr;
-    c.style.width = window.innerWidth + "px";
-    c.style.height = window.innerHeight + "px";
-    const ctx = c.getContext("2d");
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  });
-}
-
-
-/* STARS */
-const sctx=document.getElementById("spaceCanvas").getContext("2d");
-let stars=[];
-for(let i=0;i<200;i++) stars.push({x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,z:Math.random()*2+0.5,t:Math.random()*6});
-(function animateStars(){
-  sctx.clearRect(0,0,window.innerWidth,window.innerHeight);
-  stars.forEach(s=>{ s.x-=s.z*1.5; if(s.x<0)s.x=window.innerWidth; s.t+=0.03; sctx.fillStyle=`rgba(255,255,255,${0.4+Math.sin(s.t)*0.4})`; sctx.fillRect(s.x,s.y,s.z,s.z); });
-  requestAnimationFrame(animateStars);
-})();
-
-/* PLATFORM PARTICLES */
-const pctx=document.getElementById("platformParticles").getContext("2d");
-let pParticles=[];
-for(let i=0;i<100;i++) pParticles.push({x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,size:Math.random()*3+1,speedX:(Math.random()*1-0.5),speedY:(Math.random()*1-0.5)});
-(function animateP(){
-  pctx.clearRect(0,0,window.innerWidth,window.innerHeight);
-  pParticles.forEach(p=>{ p.x+=p.speedX; p.y+=p.speedY; if(p.x>window.innerWidth)p.x=0; if(p.x<0)p.x=window.innerWidth; if(p.y>window.innerHeight)p.y=0; if(p.y<0)p.y=window.innerHeight; pctx.fillStyle="rgba(0,255,231,0.6)"; pctx.beginPath(); pctx.arc(p.x,p.y,p.size,0,Math.PI*2); pctx.fill(); });
-  requestAnimationFrame(animateP);
-})();
-
-/* ROCKET */
-const btn=document.getElementById("enterBtn");
-const overlay=document.getElementById("warpOverlay");
-const rocket=document.getElementById("rocket");
-btn.addEventListener("click", ()=>{
-  overlay.style.opacity="1"; rocket.style.opacity="1";
-  rocket.animate([{top:"-500px",opacity:0},{top:"100%",opacity:1}],{duration:4000,easing:"cubic-bezier(0.4,0,0.2,1)",fill:"forwards"});
-  setTimeout(()=>{overlay.style.opacity="0"; rocket.style.opacity="0"; rocket.style.top="-500px"; document.body.style.overflow="auto"; document.getElementById("about").scrollIntoView({behavior:"smooth"});},4000);
+enterBtn.addEventListener("click", () => {
+  document.body.style.overflowY = "auto";
+  document.getElementById("about").scrollIntoView({ behavior: "smooth" });
 });
 
-/* AUDIO WAVEFORM */
-const audio=document.getElementById("audio");
-const playBtn=document.getElementById("playPause");
-const wf=document.getElementById("waveform");
-const wctx=wf.getContext("2d");
-wf.width=wf.offsetWidth; wf.height=wf.offsetHeight;
-const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-const source=audioCtx.createMediaElementSource(audio);
-const analyser=audioCtx.createAnalyser();
-source.connect(analyser); analyser.connect(audioCtx.destination); analyser.fftSize=256;
-const bufferLength=analyser.frequencyBinCount; const dataArray=new Uint8Array(bufferLength);
-playBtn.onclick=()=>{ if(audio.paused){audioCtx.resume();audio.play();playBtn.textContent="❚❚";}else{audio.pause();playBtn.textContent="▶";} };
-(function drawWave(){
-  requestAnimationFrame(drawWave);
-  analyser.getByteFrequencyData(dataArray);
-  wctx.clearRect(0,0,wf.width,wf.height);
-  const barWidth=wf.width/bufferLength;
-  dataArray.forEach((v,i)=>{ const h=v/255*wf.height; wctx.fillStyle=`rgba(0,255,231,0.8)`; wctx.fillRect(i*barWidth,wf.height-h,barWidth-1,h); });
-})();
+/* ===== CANVAS RESIZE FIX ===== */
+function resize() {
+  const dpr = window.devicePixelRatio || 1;
+  document.querySelectorAll("canvas").forEach(c => {
+    c.width = innerWidth * dpr;
+    c.height = innerHeight * dpr;
+    c.style.width = innerWidth + "px";
+    c.style.height = innerHeight + "px";
+    c.getContext("2d").setTransform(dpr,0,0,dpr,0,0);
+  });
+}
+resize();
+window.addEventListener("resize", resize);
 </script>
+
 </body>
 </html>
