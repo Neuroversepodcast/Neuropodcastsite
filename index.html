@@ -7,14 +7,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
+  /* ===== MOBILE VIEWPORT FIX ===== */
+.hero {
+  min-height: 100svh; /* fixes mobile browser chrome issues */
+}
+
 /* ===== GLOBAL ===== */
 body {
   margin: 0;
   font-family: 'Poppins', sans-serif;
   background: #000;
   color: #fff;
-  overflow: hidden;
 }
+
 
 h1, h2 { font-family: 'Orbitron', sans-serif; letter-spacing: 2px; text-shadow: 0 0 15px #00ffe7; }
 
@@ -108,6 +113,49 @@ h1, h2 { font-family: 'Orbitron', sans-serif; letter-spacing: 2px; text-shadow: 
 
 /* ===== FOOTER ===== */
 footer { background:#020202; text-align:center; padding:30px; font-size:0.9rem; color:#777; }
+/* ===== MOBILE FIXES ===== */
+@media (max-width: 768px) {
+
+  h1 {
+    font-size: 2.2rem;
+    letter-spacing: 1px;
+  }
+
+  .hero p {
+    font-size: 1rem;
+    padding: 0 10px;
+  }
+
+  .about,
+  .audio-teaser,
+  .guest-form,
+  .quote {
+    padding: 60px 6%;
+  }
+
+  .about p,
+  .audio-teaser p {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .platform-cta {
+    font-size: 1rem;
+    padding: 14px 28px;
+  }
+
+  .platform-cta img {
+    width: 22px;
+  }
+
+  .quote blockquote {
+    font-size: 1.2rem;
+  }
+
+  #rocket {
+    width: 120px;
+  }
+}
 </style>
 </head>
 <body>
@@ -184,14 +232,19 @@ footer { background:#020202; text-align:center; padding:30px; font-size:0.9rem; 
 <script>
 /* ===== CANVAS ANIMATIONS ===== */
 function resize() {
-  ["spaceCanvas","particleCanvas","platformParticles"].forEach(id=>{
-    const c=document.getElementById(id);
-    c.width=window.innerWidth;
-    c.height=window.innerHeight;
+  const dpr = window.devicePixelRatio || 1;
+
+  ["spaceCanvas","particleCanvas","platformParticles"].forEach(id => {
+    const c = document.getElementById(id);
+    c.width = window.innerWidth * dpr;
+    c.height = window.innerHeight * dpr;
+    c.style.width = window.innerWidth + "px";
+    c.style.height = window.innerHeight + "px";
+    const ctx = c.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   });
 }
-resize();
-window.addEventListener("resize", resize);
+
 
 /* STARS */
 const sctx=document.getElementById("spaceCanvas").getContext("2d");
@@ -245,7 +298,3 @@ playBtn.onclick=()=>{ if(audio.paused){audioCtx.resume();audio.play();playBtn.te
 </script>
 </body>
 </html>
-
-
-
-
